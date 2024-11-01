@@ -1,0 +1,6 @@
+*.so
+*.cpp
+*__pycache__
+build
+certs
+data

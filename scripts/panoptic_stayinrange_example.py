@@ -4,13 +4,13 @@ import numpy as np
 import time
 import asyncio
 
-from utility.panoptic_helpers import utils as ph
+from .utility.panoptic_helpers import utils as ph
+
 from hummingbot.client.settings import GatewayConnectionSetting
 # from hummingbot.core.event.events import TradeType
 from hummingbot.core.gateway.gateway_http_client import GatewayHttpClient
 from hummingbot.core.utils.async_utils import safe_ensure_future
 from hummingbot.strategy.script_strategy_base import Decimal, ScriptStrategyBase
-import time
 
 
 class TradePanoptions(ScriptStrategyBase):
@@ -72,7 +72,7 @@ class TradePanoptions(ScriptStrategyBase):
         self.log(f"Price: {self.spot_price}", 1)
         # Convert the spot price to a tick location
         self.log(f"Converting spot price to tick location...", 2)
-        self.tick_location = ph.adjustedPrice_to_tick(self.spot_price, self.request_payload["token0Decimals"], self.request_payload["token1Decimals"])
+        self.tick_location = ph.adjusted_price_to_tick(self.spot_price, self.request_payload["token0Decimals"], self.request_payload["token1Decimals"])
         self.request_payload.update({
             "atTick": int(np.floor(self.tick_location))
         })
@@ -185,7 +185,7 @@ class TradePanoptions(ScriptStrategyBase):
             self.request_payload.update({
                 "panopticPool": self.request_payload["panopticPoolAddress"], #redundant
                 "positionIdList": self.open_positions,
-                "positionSize": "1" + "0" * 20,
+                "positionSize": "1" + "0" * 0,
                 "effectiveLiquidityLimit": 0,
             })
 
