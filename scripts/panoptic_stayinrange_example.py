@@ -1,10 +1,10 @@
 # import asyncio
 import bisect
 import numpy as np
-import panopticHelpers as ph
 import time
 import asyncio
 
+from utility.panoptic_helpers import utils as ph
 from hummingbot.client.settings import GatewayConnectionSetting
 # from hummingbot.core.event.events import TradeType
 from hummingbot.core.gateway.gateway_http_client import GatewayHttpClient
