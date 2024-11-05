@@ -82,8 +82,8 @@ class TradePanoptions(ScriptStrategyBase):
         self.log(f"Logging spot data...", 2)
         spot_log_path = "logs/spot_data.dat"
         ph.log_spot_data(spot_log_path, self.request_payload['uniswapV3PoolAddress'], self.spot_price, self.tick_location)
-        if self.tick_count % 10 == 0:
-            ph.generate_spot_plot(spot_log_path)
+        # if self.tick_count % 10 == 0:
+            # ph.generate_spot_plot(spot_log_path)
 
         self.log(f"Finding relevant Uniswap pool tick locations...", 2)
         lower_idx = bisect.bisect_right(self.tick_locations, self.tick_location) - 1
@@ -226,11 +226,26 @@ class TradePanoptions(ScriptStrategyBase):
 
         for badPosition in bad_positions:
             burnPosition = self.open_positions[badPosition]
-            self.log(f"Burning position: {burnPosition}", 1)
+            self.log(f"Minting new position to replace: {burnPosition}", 1)
+
+            response = await GatewayHttpClient.get_instance().api_request(
+                method="post",
+                path_url="options/createStraddle",
+                params=self.request_payload,
+                fail_silently=False
+            )
+            new_position = hex(int(response['tokenId']))
+            self.log(f"Hex token ID of new position: {new_position}", 1)
+
+            # TODO check collateral - skipping that for now
+
             newPositionList = [p for p in self.open_positions if p != burnPosition]
             self.request_payload.update({
                 "burnTokenId": burnPosition,
-                "newPositionIdList": newPositionList
+                "postburnPositionIdList": newPositionList,
+                "mintTokenId": new_position,
+                "positionSize": "1" + "0" * 0,
+                "effectiveLiquidityLimit": 0
             })
 
             # Check collateral, liquidity, forceExercise vs deposit to close.
@@ -239,11 +254,11 @@ class TradePanoptions(ScriptStrategyBase):
 
             tradeData = await GatewayHttpClient.get_instance().api_request(
                 method="post",
-                path_url="options/burn",
+                path_url="options/burnAndMint",
                 params=self.request_payload,
                 fail_silently=False
             )
-            self.log(f"burn submitted... tradeData: {tradeData}", 2)
+            self.log(f"burnAndMint submitted... tradeData: {tradeData}", 2)
             await self.poll_transaction(self.chain, self.network, tradeData['txHash'])
         self.ready=True
 
