@@ -329,7 +329,8 @@ class TradePanoptions(ScriptStrategyBase):
             fail_silently=False
         )
         self.request_payload.update({
-            "panopticPoolAddress": response["panopticPoolAddress"]
+            "panopticPoolAddress": response["panopticPoolAddress"],
+            "panopticPool": response["panopticPoolAddress"],
         })
         self.log(f"Panoptic token pool address: {self.request_payload['panopticPoolAddress']}", 1)
 
