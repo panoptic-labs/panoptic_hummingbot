@@ -185,7 +185,7 @@ class TradePanoptions(ScriptStrategyBase):
             self.request_payload.update({
                 "panopticPool": self.request_payload["panopticPoolAddress"], #redundant
                 "positionIdList": self.open_positions,
-                "positionSize": "1" + "0" * 0,
+                "positionSize": "1" + "0" * 3,
                 "effectiveLiquidityLimit": 0,
             })
 
@@ -244,7 +244,7 @@ class TradePanoptions(ScriptStrategyBase):
                 "burnTokenId": burnPosition,
                 "postburnPositionIdList": newPositionList,
                 "mintTokenId": new_position,
-                "positionSize": "1" + "0" * 0,
+                "positionSize": "1" + "0" * 3,
                 "effectiveLiquidityLimit": 0
             })
 
