@@ -19,7 +19,7 @@ class TradePanoptions(ScriptStrategyBase):
     The user can configure targets, for which they provide:
     - What ticks (relative to the current tick) & timescales they need to sell Panoptions on
     - What max utilisation and minimum open interest they need to be maintaining
-    This strategy will hten get currenct spot price for the token pair, check if you're meeting
+    This strategy will then get currenct spot price for the token pair, check if you're meeting
     your targets, and sell more straddles/calls/puts to meet them if not.
     It will also keep you within gamma and close-ability guardrails.
     Strategy data is logged and plotted for analysis.
@@ -197,7 +197,7 @@ class TradePanoptions(ScriptStrategyBase):
             # TODO: Next, query the subgraph for positions with any legs purchased against this tick/width
             # - if found, increment usd_volume_bought_at_target appropriately based the notional value of each long leg of each position
 
-            # NOTE: This three-statemenet if-else tree _tries_ to handle market makers selling inequal amounts of puts and calls
+            # NOTE: This three-statement if-else tree _tries_ to handle market makers selling inequal amounts of puts and calls
             # However, if the inequality is driven by multi-leg positions that size the puts and calls differently,
             # we will fail to close your dragging positions and you will hit the positions-per-account limit pretty fast.
             # Works best with straddles/strangles, e.g. the first case:
