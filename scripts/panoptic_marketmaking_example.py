@@ -19,7 +19,7 @@ class TradePanoptions(ScriptStrategyBase):
     The user can configure targets, for which they provide:
     - What ticks (relative to the current tick) & timescales they need to sell Panoptions on
     - What max utilisation and minimum open interest they need to be maintaining
-    This strategy will then get currenct spot price for the token pair, check if you're meeting
+    This strategy will then get current spot price for the token pair, check if you're meeting
     your targets, and sell more straddles/calls/puts to meet them if not.
     It will also keep you within gamma and close-ability guardrails.
     Strategy data is logged and plotted for analysis.
