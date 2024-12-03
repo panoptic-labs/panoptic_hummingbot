@@ -164,8 +164,7 @@ class TradePanoptions(ScriptStrategyBase):
             # So we'll maintain that approach for now
             self.log(f"Checking validity of open positions...", 2)
             if len(self.open_positions) > 0:
-                # TODO: rename to ontarget_positions
-                self.applicable_positions = []
+                self.ontarget_positions = []
                 self.log(f"Checking if any open position fulfills target {target}", 2)
                 for position_index, position in enumerate(self.open_positions):
                     self.request_payload["tokenId"] = position
@@ -192,7 +191,8 @@ class TradePanoptions(ScriptStrategyBase):
                             # - get the USD notional value of what is being sold:
                             #     - strike * positionSize * USD price of the asset
                             # - increment either volume_being_sold_at_target['call'] or volume_being_sold_at_target['put'] correspondingly
-                            # TODO: Append this position onto applicable_positions
+                            # Then, append this position onto ontarget_positions:
+                            self.ontarget_positions.append(position)
 
             # TODO: Next, query the subgraph for positions with any legs purchased against this tick/width
             # - if found, increment usd_volume_bought_at_target appropriately based the notional value of each long leg of each position
@@ -214,16 +214,16 @@ class TradePanoptions(ScriptStrategyBase):
                         usd_volume_bought_at_target['put'] * (1 / target['max_utilisation']),
                         usd_volume_bought_at_target['call'] * (1 / target['max_utilisation']),
                     )
-                    # TODO: Do a burn-and-mint to burn applicable_positions, then sell a straddle with a larger position size
-                    # (Or, if applicable_positions == [], just mint the straddle)
+                    # TODO: Do a burn-and-mint to burn ontarget_positions, then sell a straddle with a larger position size
+                    # (Or, if ontarget_positions == [], just mint the straddle)
                     # How large? Well, enough to meet the minimum (and maybe a little more:)
                     # usd_notional_value_to_sell / (strike * USD price of the asset)
                     # TODO: I might need to modify burnAndMint to accept > 1 position to do this...
                     # TODO: in the future, some day, we should let people sell a strangles here instead of straddles in a
                     # config above
                     # TODO: then:
-                    # - add new position to open_positions & applicable_positions
-                    # - remove burnt positions from open_positions & applicable_positions
+                    # - add new position to open_positions & ontarget_positions
+                    # - remove burnt positions from open_positions & ontarget_positions
             else if (
                 usd_volume_being_sold_at_target['call'] < target['min_notional_value_to_sell_USD'] ||
                 usd_volume_bought_at_target['call'] / usd_volume_being_sold_at_target['call'] > target['max_utilisation']
@@ -232,25 +232,25 @@ class TradePanoptions(ScriptStrategyBase):
                     target['min_notional_value_to_sell_USD'],
                     usd_volume_bought_at_target['call'] * (1 / target['max_utilisation']),
                 )
-                # TODO: Filter applicable_positions to just single-leg sold calls
+                # TODO: Filter ontarget_positions to just single-leg sold calls
                 # TODO: Then, burn-and-mint to burn the old calls and sell a new call at size:
                 # usd_notional_value_to_sell / (strike * USD price of the asset)
                 # TODO: then:
-                # - add new position to open_positions & applicable_positions
-                # - remove burnt positions from open_positions & applicable_positions
+                # - add new position to open_positions & ontarget_positions
+                # - remove burnt positions from open_positions & ontarget_positions
             else if (
                 usd_volume_being_sold_at_target['put'] < target['min_notional_value_to_sell_USD'] ||
                 usd_volume_bought_at_target['put'] / usd_volume_being_sold_at_target['put'] > target['max_utilisation']
             ):
-                # TODO: Filter applicable_positions to just single-leg sold puts
+                # TODO: Filter ontarget_positions to just single-leg sold puts
                 # TODO: Then, burn-and-mint to burn the old puts and sell a new put at size:
                 # usd_notional_value_to_sell / (strike * USD price of the asset)
                 # TODO: then:
-                # - add new position to open_positions & applicable_positions
-                # - remove burnt positions from open_positions & applicable_positions
+                # - add new position to open_positions & ontarget_positions
+                # - remove burnt positions from open_positions & ontarget_positions
 
         if !maintain_offtarget_positions:
-            offtarget_positions = [position for position in self.open_positions if position not in applicable_positions]
+            offtarget_positions = [position for position in self.open_positions if position not in ontarget_positions]
             # TODO: we need an endpoint to call burnOptions(tokenId[]); for now, iteratively calling burnOption(tokenId)
             for offtarget_position in offtarget_positions:
                 updated_open_positions = [position for position in self.open_positions if position != offtarget_position]
@@ -383,6 +383,7 @@ class TradePanoptions(ScriptStrategyBase):
 
         self.wallet_address=self.address #redundant
 
+        # TODO: Approve tokens and deposit
         self.initialized=True
 
     # continuously poll for transaction until confirmed
