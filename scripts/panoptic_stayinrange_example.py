@@ -16,7 +16,7 @@ from hummingbot.strategy.script_strategy_base import Decimal, ScriptStrategyBase
 class TradePanoptions(ScriptStrategyBase):
     """
     This example shows how to relevant Gateway endpoints trade options on the Panoptic Protocol.
-    This strategy attempts to maintain a position in range of the currenct spot price on the
+    This strategy attempts to maintain a position in range of the current spot price on the
     Uniswap token pool. If no in-range position exists, one is created. If a position is
     out-of-range, it is burned. Collateral requirements to mint/burn positions are checked.
     If a short position is held by another user, the strategy will attempt to force exercise the
